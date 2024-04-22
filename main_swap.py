@@ -32,8 +32,8 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     # be sure to export your email and psw as environmental variables
-    EMAIL = os.getenv("ERASEID_EMAIL")
-    PASSWORD = os.getenv("ERASEID_PASSWORD")
+    EMAIL = os.getenv("SWAPID_EMAIL")
+    PASSWORD = os.getenv("SWAPID_PASSWORD")
 
     # Parameters
     # to be added

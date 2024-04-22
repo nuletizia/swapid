@@ -1,7 +1,7 @@
 <p align="center">
   <img src="https://id.piktid.com/logo.svg" alt="EraseID by PiktID logo" width="150">
   </br>
-  <h3 align="center"><a href="[https://id.piktid.com](https://id.piktid.com)">EraseID by PiktID</a></h3>
+  <h3 align="center"><a href="[https://studio.piktid.com](https://id.piktid.com)">SwapID by PiktID</a></h3>
 </p>
 
 
@@ -9,7 +9,7 @@
 [![Official Website](https://img.shields.io/badge/Official%20Website-piktid.com-blue?style=flat&logo=world&logoColor=white)](https://piktid.com)
 [![Discord Follow](https://dcbadge.vercel.app/api/server/FJU39e9Z4P?style=flat)](https://discord.com/invite/FJU39e9Z4P)
 
-FaceSwap implementation by PiktID. 
+FaceSwap implementation by PiktID (Alpha version)
 -- Work in progress --
 
 
@@ -21,7 +21,7 @@ FaceSwap implementation by PiktID.
 The following instructions suppose you have already installed a recent version of Python. For a general overview, please visit the <a href="https://api.piktid.com/docs">API documentation</a>.
 To use any PiktID API, an access token is required. 
 
-> **Step 0** - Register <a href="https://id.piktid.com">here</a>. 10 credits are given for free to all new users.
+> **Step 0** - Register <a href="https://studio.piktid.com">here</a>. 10 credits are given for free to all new users.
 
 > **Step 1** - Clone the SwapID library
 ```bash
@@ -32,8 +32,8 @@ $ cd swapid
 
 > **Step 2** - Export the email and password as environmental variables
 ```bash
-$ export ERASEID_EMAIL={Your email here}
-$ export ERASEID_PASSWORD={Your password here}
+$ export SWAPID_EMAIL={Your email here}
+$ export SWAPID_PASSWORD={Your password here}
 ```
 
 > **Step 3** - You can provide both the absolute path of the target and face image (containing a person). Add the arguments
@@ -47,14 +47,14 @@ or
 
 > **Step 4** - Run the main function
 ```bash
-$ python3 main.py --target_path 'mydir/mytarget.jpg' --face_path 'mydir/mysource.jpg'
+$ python3 main_swap.py --target_path 'mydir/mytarget.jpg' --face_path 'mydir/mysource.jpg'
 ```
 
 Without any additional argument, SwapID will upload both images into PiktID's servers and process them. The output will contain the link of the swapped image and two codes to be used for further re-generations, one for the target 'abc' and one for the face 'xyz'.
 
 > **Step 5** - Rerun the main function with PiktID's codes
 ```bash
-$ python3 main.py --target_path 'mydir/mytarget.jpg' --face_path 'mydir/mysource.jpg' --face_name 'xyz' --target_name 'abc'
+$ python3 main_swap.py --target_path 'mydir/mytarget.jpg' --face_path 'mydir/mysource.jpg' --face_name 'xyz' --target_name 'abc'
 ```
 
 -- WORK IN PROGRESS --
