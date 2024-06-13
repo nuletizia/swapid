@@ -1,9 +1,3 @@
-import os
-import sys
-import json
-from io import BytesIO
-from PIL import Image, ImageFile, ImageFilter
-
 from swap_api import swap_all_call, swap_call, upload_target_call, upload_face_call
 
 
@@ -52,5 +46,3 @@ def process_image(PARAM_DICTIONARY, TOKEN_DICTIONARY):
         print(f'links: {links}')   
 
     return True
-
-

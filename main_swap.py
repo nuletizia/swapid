@@ -1,22 +1,20 @@
 import os
 import sys
-import json
 import argparse
-from io import BytesIO
 from random import randint
-from PIL import Image, ImageFile, ImageFilter
 
 from swap_utils import process_image
 from swap_api import start_call
 
+
 def check_range(value):
     ivalue = int(value)
-    if ivalue <= 0 or ivalue >4:
-        raise argparse.ArgumentTypeError("%s is an invalid integer, only the range 1-4 is supported" % value)
+    if ivalue <= 0 or ivalue > 4:
+        raise argparse.ArgumentTypeError("%s is an invalid integer, only 1 generation is currently supported" % value)
     return ivalue
 
-if __name__ == '__main__':
 
+if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
 
@@ -26,7 +24,7 @@ if __name__ == '__main__':
     parser.add_argument('--target_name', help='Target image code name, it overwrites the target path', type=str, default=None)
     parser.add_argument('--face_name', help='Face image code name, it overwrites the face path', type=str, default=None)
 
-    parser.add_argument('--seed', help='Generation seed', type=int, default=randint(0,100000))
+    parser.add_argument('--seed', help='Generation seed', type=int, default=randint(0, 100000))
     parser.add_argument('--num_generations', help='Number of generations', type=check_range, default=1)
 
     args = parser.parse_args()
@@ -74,12 +72,12 @@ if __name__ == '__main__':
 
     # to add many more
     PARAM_DICTIONARY = {
-            'TARGET_PATH':TARGET_PATH,
-            'FACE_PATH':FACE_PATH,
-            'TARGET_NAME':TARGET_NAME,
-            'FACE_NAME':FACE_NAME,
-            'SEED':SEED,
-            'NUM_GENERATIONS':NUM_GENERATIONS,
+            'TARGET_PATH': TARGET_PATH,
+            'FACE_PATH': FACE_PATH,
+            'TARGET_NAME': TARGET_NAME,
+            'FACE_NAME': FACE_NAME,
+            'SEED': SEED,
+            'NUM_GENERATIONS': NUM_GENERATIONS,
         }
 
     response = process_image(PARAM_DICTIONARY, TOKEN_DICTIONARY)
