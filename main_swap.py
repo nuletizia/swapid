@@ -9,7 +9,7 @@ from swap_api import start_call
 
 def check_range(value):
     ivalue = int(value)
-    if ivalue <= 0 or ivalue > 4:
+    if ivalue <= 0 or ivalue > 1:
         raise argparse.ArgumentTypeError("%s is an invalid integer, only 1 generation is currently supported" % value)
     return ivalue
 
