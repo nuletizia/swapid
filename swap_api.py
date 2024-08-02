@@ -15,15 +15,6 @@ def open_image_from_url(url):
     return image
 
 
-def open_image_from_path(path):
-    f = open(path, 'rb')
-    buffer = BytesIO(f.read())
-    image = Image.open(buffer)
-    return image
-
-    return BytesIO(response.content)
-
-
 def im_2_B(image):
     # Convert Image to buffer
     buff = BytesIO()
