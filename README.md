@@ -5,13 +5,11 @@
 </p>
 
 
-# SwapID - v1.0.0
+# SwapID - v2.0.0
 [![Official Website](https://img.shields.io/badge/Official%20Website-piktid.com-blue?style=flat&logo=world&logoColor=white)](https://piktid.com)
 [![Discord Follow](https://dcbadge.vercel.app/api/server/FJU39e9Z4P?style=flat)](https://discord.com/invite/FJU39e9Z4P)
 
-FaceSwap implementation by PiktID (Alpha version)
--- Work in progress --
-
+FaceSwap implementation by PiktID (Beta version).
 
 ## Getting Started
 <a target="_blank" href="https://colab.research.google.com/drive/1thetaQymYgpHtFu1nAUwbsq3Su3vxXAC?usp=sharing">
@@ -57,8 +55,10 @@ Without any additional argument, SwapID will upload both images into PiktID's se
 $ python3 main_swap.py --target_path 'mydir/mytarget.jpg' --face_path 'mydir/mysource.jpg' --face_name 'xyz' --target_name 'abc'
 ```
 
--- WORK IN PROGRESS --
-
+> **Step 6** - If the result is not satisfactory enough, we recommend changing the seed
+```bash
+$ python3 main_swap.py --target_path 'mydir/mytarget.jpg' --face_path 'mydir/mysource.jpg' --face_name 'xyz' --target_name 'abc' --seed 1234
+```
 
 
 

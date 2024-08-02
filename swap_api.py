@@ -31,7 +31,7 @@ def im_2_B(image):
     if image.mode == 'CMYK':
         image = ImageCms.profileToProfile(image, 'ISOcoated_v2_eci.icc', 'sRGB Color Space Profile.icm', renderingIntent=0, outputMode='RGB')
 
-    image.save(buff, format='PNG',icc_profile=image.info.get('icc_profile'))
+    image.save(buff, format='PNG', icc_profile=image.info.get('icc_profile'))
     img_str = buff.getvalue()
     return img_str
 
@@ -43,7 +43,7 @@ def im_2_buffer(image):
     if image.mode == 'CMYK':
         image = ImageCms.profileToProfile(image, 'ISOcoated_v2_eci.icc', 'sRGB Color Space Profile.icm', renderingIntent=0, outputMode='RGB')
 
-    image.save(buff, format='PNG',icc_profile=image.info.get('icc_profile'))
+    image.save(buff, format='PNG', icc_profile=image.info.get('icc_profile'))
     return buff
 
 
