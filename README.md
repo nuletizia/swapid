@@ -24,7 +24,7 @@ To use any PiktID API, an access token is required. Moreover, PiktID is currentl
 > **Step 1** - Clone the SwapID library
 ```bash
 # Installation commands
-$ git clone https://github.com/nuletizia/swapid.git
+$ git clone https://github.com/piktid/swapid.git
 $ cd swapid
 ```
 
