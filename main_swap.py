@@ -19,13 +19,15 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
     parser.add_argument('--target_path', help='Input image file absolute path', type=str, default=None)
+    parser.add_argument('--target_url', help='Input image url, use only if no target path was given', type=str, default='https://images.piktid.com/frontend/studio/swapid/target/monalisa.jpg')
+
     parser.add_argument('--face_path', help='Input face file absolute path', type=str, default=None)
+    parser.add_argument('--face_url', help='Input face url, use only if no face path was given', type=str, default='https://images.piktid.com/frontend/studio/swapid/face/einstein.jpg')
 
     parser.add_argument('--target_name', help='Target image code name, it overwrites the target path', type=str, default=None)
     parser.add_argument('--face_name', help='Face image code name, it overwrites the face path', type=str, default=None)
 
     parser.add_argument('--seed', help='Generation seed', type=int, default=randint(0, 100000))
-    parser.add_argument('--num_generations', help='Number of generations', type=check_range, default=1)
 
     args = parser.parse_args()
 
@@ -38,15 +40,16 @@ if __name__ == '__main__':
 
     # Generation parameters
     SEED = args.seed
-    NUM_GENERATIONS = args.num_generations
     # to add more
 
     # Image parameters
     TARGET_PATH = args.target_path
+    TARGET_URL = args.target_url
     TARGET_NAME = args.target_name
 
     # Swap parameters
     FACE_PATH = args.face_path
+    FACE_URL = args.face_url
     FACE_NAME = args.face_name
 
     if TARGET_PATH is not None:
@@ -56,7 +59,11 @@ if __name__ == '__main__':
             print('Wrong filepath, check again')
     else:
         print('Target filepath not assigned, check again')
-        sys.exit()
+        if TARGET_URL is not None:
+            print(f'Using the input image located at: {TARGET_URL}')
+        else:
+            print('Wrong target url, check again')
+            sys.exit()
 
     if FACE_PATH is not None:
         if os.path.exists(FACE_PATH):
@@ -65,7 +72,11 @@ if __name__ == '__main__':
             print('Wrong face path, check again')
             sys.exit()
     else:
-        print('Face path not assigned, check again')
+        if FACE_URL is not None:
+            print(f'Using the input face located at: {FACE_URL}')
+        else:
+            print('Wrong face url, check again')
+            sys.exit()
 
     # log in
     TOKEN_DICTIONARY = start_call(EMAIL, PASSWORD)
@@ -73,11 +84,12 @@ if __name__ == '__main__':
     # to add many more
     PARAM_DICTIONARY = {
             'TARGET_PATH': TARGET_PATH,
+            'TARGET_URL': TARGET_URL,
             'FACE_PATH': FACE_PATH,
+            'FACE_URL': FACE_URL,
             'TARGET_NAME': TARGET_NAME,
             'FACE_NAME': FACE_NAME,
             'SEED': SEED,
-            'NUM_GENERATIONS': NUM_GENERATIONS,
         }
 
     response = process_image(PARAM_DICTIONARY, TOKEN_DICTIONARY)
