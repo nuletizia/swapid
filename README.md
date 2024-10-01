@@ -17,7 +17,7 @@ FaceSwap implementation by PiktID (Beta version).
 </a>
 
 The following instructions suppose you have already installed a recent version of Python. For a general overview, please visit the <a href="https://api.piktid.com/docs">API documentation</a>.
-To use any PiktID API, an access token is required. 
+To use any PiktID API, an access token is required. Moreover, PiktID is currently manually granting access to users.
 
 > **Step 0** - Register <a href="https://studio.piktid.com">here</a>. 10 credits are given for free to all new users.
 
@@ -43,7 +43,7 @@ or
 ...
 ```
 
-Alternatively, you can provide the url of the target and face image, as in the default example
+Alternatively, you can provide the url of the target and face image, as in the default example with the Einstein face on the Monalisa image.
 ```bash
 $ python3 main_swap.py --target_url 'https://images.piktid.com/frontend/studio/swapid/target/monalisa.jpg' --face_url 'https://images.piktid.com/frontend/studio/swapid/face/einstein.jpg'
 ```
