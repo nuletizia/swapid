@@ -85,6 +85,8 @@ def refresh_call(TOKEN_DICTIONARY):
 # -----------UPLOAD FUNCTIONS------------
 def upload_target_call(PARAM_DICTIONARY, TOKEN_DICTIONARY):
 
+    HEADSWAP = PARAM_DICTIONARY.get('HEADSWAP')
+
     target_full_path = PARAM_DICTIONARY.get('TARGET_PATH')
     if target_full_path is None:
         target_url = PARAM_DICTIONARY.get('TARGET_URL')
@@ -97,13 +99,16 @@ def upload_target_call(PARAM_DICTIONARY, TOKEN_DICTIONARY):
 
     OPTIONS_DICT = {}
 
+    if HEADSWAP:
+        OPTIONS_DICT = {**OPTIONS_DICT, 'flag_hair': HEADSWAP}
+
     # start the generation process given the image parameters
     TOKEN = TOKEN_DICTIONARY.get('access_token', '')
     URL_API = TOKEN_DICTIONARY.get('url_api')
 
-    response = requests.post(URL_API+'/swap/target', 
+    response = requests.post(URL_API+'/consistent_identities/upload_target', 
                              headers={'Authorization': 'Bearer '+TOKEN},
-                             files={'target': image_file},
+                             files={'file': image_file},
                              data={'options': json.dumps(OPTIONS_DICT)},
                              )
 
@@ -111,15 +116,23 @@ def upload_target_call(PARAM_DICTIONARY, TOKEN_DICTIONARY):
         TOKEN_DICTIONARY = refresh_call(TOKEN_DICTIONARY)
         TOKEN = TOKEN_DICTIONARY.get('access_token', '')
         # try with new TOKEN
-        response = requests.post(URL_API+'/swap/target', 
+        response = requests.post(URL_API+'/consistent_identities/upload_target', 
                                  headers={'Authorization': 'Bearer '+TOKEN},
-                                 files={'target': image_file},
+                                 files={'file': image_file},
                                  data={'options': json.dumps(OPTIONS_DICT)},
                                  )
 
     response_json = json.loads(response.text)
+    # print(response_json)
+    image_address = response_json.get('image_id')  # image id
+    # below you find useful information if you want to create a UI
 
-    return response_json
+    # faces_dict = response_json.get('faces')  # faces dictionary
+    # indices_info = faces_dict.get('coordinates_list')
+    # selected_faces_list = faces_dict.get('selected_faces')  # faces that can be modified
+    # number_of_faces = faces_dict.get('number_of_faces')  # information about the number of faces
+
+    return image_address
 
 
 def upload_face_call(PARAM_DICTIONARY, TOKEN_DICTIONARY):
@@ -134,68 +147,73 @@ def upload_face_call(PARAM_DICTIONARY, TOKEN_DICTIONARY):
     else:
         face_file = open(face_full_path, 'rb')
 
-    OPTIONS_DICT = {}
+    identity_name = PARAM_DICTIONARY.get('FACE_NAME')
 
     # start the generation process given the image parameters
     TOKEN = TOKEN_DICTIONARY.get('access_token', '')
     URL_API = TOKEN_DICTIONARY.get('url_api')
 
-    response = requests.post(URL_API+'/swap/face', 
+    response = requests.post(URL_API+'/consistent_identities/upload_face', 
                              headers={'Authorization': 'Bearer '+TOKEN},
-                             files={'face': face_file},
-                             data={'options': json.dumps(OPTIONS_DICT)},
+                             files={'file': face_file},
+                             data={'identity_name': identity_name},
                              )
 
     if response.status_code == 401:
         TOKEN_DICTIONARY = refresh_call(TOKEN_DICTIONARY)
         TOKEN = TOKEN_DICTIONARY.get('access_token', '')
         # try with new TOKEN
-        response = requests.post(URL_API+'/swap/face', 
+        response = requests.post(URL_API+'/consistent_identities/upload_face', 
                                  headers={'Authorization': 'Bearer '+TOKEN},
-                                 files={'face': face_file},
-                                 data={'options': json.dumps(OPTIONS_DICT)},
+                                 files={'file': face_file},
+                                 data={'identity_name': identity_name},
                                  )
 
     response_json = json.loads(response.text)
-
+    #print(response_json)
     return response_json
 
 
 # -----------SWAP FUNCTION------------
-def swap_call(PARAM_DICTIONARY, TOKEN_DICTIONARY):
+def consistent_generation_call(idx_face, PARAM_DICTIONARY, TOKEN_DICTIONARY):
 
-    FACE_NAME = PARAM_DICTIONARY.get('FACE_NAME')
-    TARGET_NAME = PARAM_DICTIONARY.get('TARGET_NAME')
+    image_address = PARAM_DICTIONARY.get('TARGET_NAME')
+    identity_name = PARAM_DICTIONARY.get('FACE_NAME')
 
     SEED = PARAM_DICTIONARY.get('SEED')
-    STRENGTH = PARAM_DICTIONARY.get('STRENGTH')
+    PROMPT_STRENGTH = PARAM_DICTIONARY.get('STRENGTH')
 
-    OPTIONS_DICT = {}
+    OPTIONS_DICT = {'flag_replace_and_download': True}
+
     if SEED is not None:
         OPTIONS_DICT = {**OPTIONS_DICT, 'seed': SEED}
-    if STRENGTH is not None:
-        OPTIONS_DICT = {**OPTIONS_DICT, 'strength': STRENGTH}
+
+    if PROMPT_STRENGTH is not None:
+        OPTIONS_DICT = {**OPTIONS_DICT, 'prompt_strength': PROMPT_STRENGTH}
+
+    data = {'id_image': image_address, 'id_face': idx_face, 'identity_name': identity_name, 'options': json.dumps(OPTIONS_DICT)}
+    print(f'data to send to generation: {data}')
 
     # start the generation process given the image parameters
     TOKEN = TOKEN_DICTIONARY.get('access_token', '')
     URL_API = TOKEN_DICTIONARY.get('url_api')
 
-    response = requests.post(URL_API+'/swap/generate', 
+    response = requests.post(URL_API+'/consistent_identities/generate',
                              headers={'Authorization': 'Bearer '+TOKEN},
-                             data={'face_name': FACE_NAME, 'target_name': TARGET_NAME, 'options': json.dumps(OPTIONS_DICT)},
+                             json=data,
                              )
-
+    # if the access token is expired
     if response.status_code == 401:
         TOKEN_DICTIONARY = refresh_call(TOKEN_DICTIONARY)
         TOKEN = TOKEN_DICTIONARY.get('access_token', '')
         # try with new TOKEN
-        response = requests.post(URL_API+'/swap/generate', 
+        response = requests.post(URL_API+'/consistent_identities/generate',
                                  headers={'Authorization': 'Bearer '+TOKEN},
-                                 data={'face_name': FACE_NAME, 'target_name': TARGET_NAME, 'options': json.dumps(OPTIONS_DICT)},
+                                 json=data,
                                  )
 
+    # print(response.text)
     response_json = json.loads(response.text)
-
     return response_json
 
 
@@ -205,7 +223,7 @@ def get_notification_by_name(name_list, TOKEN_DICTIONARY):
     TOKEN = TOKEN_DICTIONARY.get('access_token', '')
     URL_API = TOKEN_DICTIONARY.get('url_api')
 
-    response = requests.post(URL_API+'/swap/notification_by_name',
+    response = requests.post(URL_API+'/consistent_identities/notification/read',
                              headers={'Authorization': 'Bearer '+TOKEN},
                              json={'name_list': name_list},
                              # timeout=100,
@@ -215,14 +233,14 @@ def get_notification_by_name(name_list, TOKEN_DICTIONARY):
         # try with new TOKEN
         TOKEN_DICTIONARY = refresh_call(TOKEN_DICTIONARY)
         TOKEN = TOKEN_DICTIONARY.get('access_token', '')
-        response = requests.post(URL_API+'/swap/notification_by_name',
+        response = requests.post(URL_API+'/consistent_identities/notification/read',
                                  headers={'Authorization': 'Bearer '+TOKEN},
                                  json={'name_list': name_list},
                                  # timeout=100,
                                  )
     # print(response.text)
     response_json = json.loads(response.text)
-    return response_json.get('notifications_list')
+    return response_json.get('notifications_list',[])
 
 
 def delete_notification(notification_id, TOKEN_DICTIONARY):
@@ -230,7 +248,7 @@ def delete_notification(notification_id, TOKEN_DICTIONARY):
     URL_API = TOKEN_DICTIONARY.get('url_api')
 
     print(f'notification_id: {notification_id}')
-    response = requests.delete(URL_API+'/swap/notification/delete',
+    response = requests.delete(URL_API+'/consistent_identities/notification/delete',
                                headers={'Authorization': 'Bearer '+TOKEN},
                                json={'id': notification_id},
                                # timeout=100,
@@ -240,7 +258,7 @@ def delete_notification(notification_id, TOKEN_DICTIONARY):
         # try with new TOKEN
         TOKEN_DICTIONARY = refresh_call(TOKEN_DICTIONARY)
         TOKEN = TOKEN_DICTIONARY.get('access_token', '')
-        response = requests.delete(URL_API+'/swap/notification/delete',
+        response = requests.delete(URL_API+'/consistent_identities/notification/delete',
                                    headers={'Authorization': 'Bearer '+TOKEN},
                                    json={'id': notification_id},
                                    # timeout=100,
@@ -250,13 +268,13 @@ def delete_notification(notification_id, TOKEN_DICTIONARY):
     return response.text
 
 
-def handle_notifications_new_swap(FACE_NAME, TARGET_NAME, TOKEN_DICTIONARY):
+def handle_notifications_new_swap_download(image_id, TOKEN_DICTIONARY):
     # check notifications to verify the generation status
     i = 0
-    while i < 30:  # max 20 iterations -> then timeout
+    while i < 10:  # max 20 iterations -> then timeout
         i = i+1
-        notifications_list = get_notification_by_name('swap', TOKEN_DICTIONARY)
-        notifications_to_remove = [n for n in notifications_list if (n.get('name') == 'swap' and n.get('data').get('face_name') == FACE_NAME and n.get('data').get('target_name') == TARGET_NAME)]
+        notifications_list = get_notification_by_name('download', TOKEN_DICTIONARY)
+        notifications_to_remove = [n for n in notifications_list if (n.get('name') == 'download' and n.get('data').get('id_image') == image_id )]
 
         print(f'notifications_to_remove: {notifications_to_remove}')
         # remove notifications
@@ -264,12 +282,12 @@ def handle_notifications_new_swap(FACE_NAME, TARGET_NAME, TOKEN_DICTIONARY):
         print(result_delete)
 
         if len(notifications_to_remove) > 0:
-            print(f'Swap for face {FACE_NAME} and target {TARGET_NAME} completed')
+            print(f'download for image_id {image_id} completed')
             return True, {**notifications_to_remove[0].get('data', {})}
 
         # check iteration
-        if i >= 20:
-            print('Timeout. Error in swapping faces')
+        if i >= 10:
+            print('Timeout. Error in generating consistent faces')
             return False, {}
 
         # wait
