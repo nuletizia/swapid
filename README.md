@@ -9,7 +9,7 @@
 [![Official Website](https://img.shields.io/badge/Official%20Website-piktid.com-blue?style=flat&logo=world&logoColor=white)](https://piktid.com)
 [![Discord Follow](https://dcbadge.vercel.app/api/server/FJU39e9Z4P?style=flat)](https://discord.com/invite/FJU39e9Z4P)
 
-FaceSwap implementation by PiktID (Beta version).
+Face Swap implementation by PiktID (Beta version).
 
 ## Getting Started
 <a target="_blank" href="https://colab.research.google.com/drive/1thetaQymYgpHtFu1nAUwbsq3Su3vxXAC?usp=sharing">
@@ -75,13 +75,21 @@ If the result is not satisfactory enough, we recommend either using the "consist
 ```bash
 $ python3 main_swap.py --target_name 'abc' --face_name 'xyz' --seed 1234 --strength '0.6'
 ```
+
+> **Step 8** - Multiple faces
+
+If you have a **target image** with multiple subjects, you can use the "consistent_identities" endpoint and tell the system, via the **idx_face** integer argument, which face to swap. As an example:
+```bash
+$ python3 main_swap.py --target_path 'mydir/mytarget.jpg' --face_path 'mydir/mysource.jpg' --endpoint 'consistent_identities' --idx_face 0
+```
+
 ## Head Swap
 It is also possible to include the hair in the swapping process. To do that, you need to use the "consistent_identities" endpoint and run the command 
 ```bash
 $ python3 main_swap.py --target_path 'mydir/mytarget.jpg' --face_path 'mydir/mysource.jpg' --endpoint 'consistent_identities' --hair
 ```
 
-## Skin Swap (coming soon)
+## Skin Swap (Coming soon)
 Please contact us for more details.
 
 ## Contact
