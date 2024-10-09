@@ -1,7 +1,7 @@
 <p align="center">
-  <img src="https://id.piktid.com/logo.svg" alt="EraseID by PiktID logo" width="150">
+  <img src="https://id.piktid.com/logo.svg" alt="SwapID by PiktID logo" width="150">
   </br>
-  <h3 align="center"><a href="[https://studio.piktid.com](https://id.piktid.com)">SwapID by PiktID</a></h3>
+  <h3 align="center"><a href="[https://studio.piktid.com](https://swap.piktid.com)">SwapID by PiktID</a></h3>
 </p>
 
 
@@ -73,7 +73,7 @@ $ python3 main_swap.py --target_name 'abc' --face_name 'xyz'
 
 If the result is not satisfactory enough, we recommend either using the "consistent_identities" endpoint or changing the seed or strength of the source image (lower strength results in low influence of the source on the output)
 ```bash
-$ python3 main_swap.py --target_name 'abc' --face_name 'xyz' --seed 1234 --strength 
+$ python3 main_swap.py --target_name 'abc' --face_name 'xyz' --seed 1234 --strength '0.6'
 ```
 ## Head Swap
 It is also possible to include the hair in the swapping process. To do that, you need to use the "consistent_identities" endpoint and run the command 
