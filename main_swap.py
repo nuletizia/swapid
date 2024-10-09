@@ -7,9 +7,18 @@ from swap_utils import process_image
 from swap_api import start_call
 
 
+def check_range(value):
+    ivalue = int(value)
+    if ivalue < 0 or ivalue > 2:
+        raise argparse.ArgumentTypeError("%s Only a maximum of 3 faces in the same photo is currently supported" % value)
+    return ivalue
+
+
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
+
+    parser.add_argument('--endpoint', help='swap is for quick and demo test, applicable to portraits. consistent_identities is for robust face/head swap via EraseID, it handles multiple faces', type=str, default='swap')
 
     parser.add_argument('--target_path', help='Input image file absolute path', type=str, default=None)
     parser.add_argument('--target_url', help='Input image url, use only if no target path was given', type=str, default='https://images.piktid.com/frontend/studio/swapid/target/monalisa.jpg')
@@ -21,6 +30,11 @@ if __name__ == '__main__':
     parser.add_argument('--face_name', help='Face image code name, it overwrites the face path', type=str, default=None)
 
     parser.add_argument('--seed', help='Generation seed', type=int, default=randint(0, 100000))
+    parser.add_argument('--strength', help='Input face have low impact on the output for low values of the strength (range 0-1)', type=float, default=None)
+
+    # Consistent identities parameters
+    parser.add_argument('--hair', help='Change also the hair', action='store_true')
+    parser.add_argument('--idx_face', help='Index of the person to change in the target image, to use only with consistent_identities endpoint', type=check_range, default=0)
 
     args = parser.parse_args()
 
@@ -28,11 +42,17 @@ if __name__ == '__main__':
     EMAIL = os.getenv("SWAPID_EMAIL")
     PASSWORD = os.getenv("SWAPID_PASSWORD")
 
+    # Consistent identities parameters
+    ENDPOINT = args.endpoint  # True if you want to use the EraseID backend to process multiple persons
+    HEADSWAP = args.hair  # True if the swap shall include the hair (Head-swap)
+    IDX_FACE = args.idx_face  # index of the person in the target image to swap
+
     # Parameters
     # to be added
 
     # Generation parameters
     SEED = args.seed
+    STRENGTH = args.strength
     # to add more
 
     # Image parameters
@@ -76,6 +96,9 @@ if __name__ == '__main__':
 
     # to add many more
     PARAM_DICTIONARY = {
+            'ENDPOINT': ENDPOINT,
+            'HEADSWAP': HEADSWAP,
+            'IDX_FACE': IDX_FACE,
             'TARGET_PATH': TARGET_PATH,
             'TARGET_URL': TARGET_URL,
             'FACE_PATH': FACE_PATH,
@@ -83,6 +106,7 @@ if __name__ == '__main__':
             'TARGET_NAME': TARGET_NAME,
             'FACE_NAME': FACE_NAME,
             'SEED': SEED,
+            'STRENGTH': STRENGTH,
         }
 
     response = process_image(PARAM_DICTIONARY, TOKEN_DICTIONARY)
