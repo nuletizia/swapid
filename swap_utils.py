@@ -98,7 +98,16 @@ def process_image(PARAM_DICTIONARY, TOKEN_DICTIONARY):
             print('Error retrieving the generated faces. No images found after 10 attempts')
             return False
 
-        download_link = response_notifications.get('link')
+        
+        download_link = response_notifications.get('link_hd') # high quality version - pro user
+        if download_link is None:
+            download_link = response_notifications.get('link') # low quality version
+        if isinstance(download_link, dict) and not download_link:
+            download_link = response_notifications.get('link') # low quality version
+        if download_link == '':
+            download_link = response_notifications.get('link') # low quality version
+        
+        #print(response_notifications)
         print('new image ready for download:', download_link)
 
     else:
