@@ -9,8 +9,8 @@ from swap_api import start_call
 
 def check_range(value):
     ivalue = int(value)
-    if ivalue < 0 or ivalue > 2:
-        raise argparse.ArgumentTypeError("%s Only a maximum of 3 faces in the same photo is currently supported" % value)
+    if ivalue < 0 or ivalue > 29:
+        raise argparse.ArgumentTypeError("%s Only a maximum of 30 faces in the same photo is currently supported" % value)
     return ivalue
 
 
