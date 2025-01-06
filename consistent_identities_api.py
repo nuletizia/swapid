@@ -123,16 +123,16 @@ def upload_target_call(PARAM_DICTIONARY, TOKEN_DICTIONARY):
                                  )
 
     response_json = json.loads(response.text)
-    #print(response_json)
+    # print(response_json)
     
     # below you find useful information if you want to create a UI
     
     # faces_dict = response_json.get('faces')  # faces dictionary
-    number_of_detected_faces = len(response_json.get('faces',{}).get('approved_faces',[])) # information about the number of faces
-    number_of_approved_faces = response_json.get('faces',{}).get('approved_faces',[]).count(1) # information about the number of faces approved for editing
+    number_of_detected_faces = len(response_json.get('faces', {}).get('approved_faces', []))  # information about the number of faces
+    number_of_approved_faces = response_json.get('faces', {}).get('approved_faces', []).count(1)  # information about the number of faces approved for editing
     # indices_info = response_json.get('faces',{}).get('coordinates_list',[]) # coordiate list of all detected faces
-    print('Number of detected faces:',number_of_detected_faces)
-    print('Number of approved faces:',number_of_approved_faces)
+    print('Number of detected faces:', number_of_detected_faces)
+    print('Number of approved faces:', number_of_approved_faces)
     print(f'Select the face to swap with the parameter idx_face. From 0 to {number_of_detected_faces-1}. For example: --idx_face {number_of_detected_faces-1}.')
     
     image_address = response_json.get('image_id')  # image id
@@ -174,7 +174,7 @@ def upload_face_call(PARAM_DICTIONARY, TOKEN_DICTIONARY):
                                  )
 
     response_json = json.loads(response.text)
-    #print(response_json)
+    # print(response_json)
     return response_json
 
 
