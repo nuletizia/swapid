@@ -1,4 +1,4 @@
-from consistent_identities_api import upload_target_call as CI_upload_target_call, upload_face_call as CI_upload_face_call, consistent_generation_call as CI_call, handle_notifications_new_swap_download as CI_handle_notifications_new
+from .consistent_identities_api import upload_target_call as CI_upload_target_call, upload_face_call as CI_upload_face_call, consistent_generation_call as CI_call, handle_notifications_new_swap_download as CI_handle_notifications_new
 
 
 def process_image(PARAM_DICTIONARY, TOKEN_DICTIONARY):
@@ -32,7 +32,9 @@ def process_image(PARAM_DICTIONARY, TOKEN_DICTIONARY):
     # WE NEED TO ADD A VERIFICATION MECHANISM OF THE IDX_FACE, BECAUSE IF THE IDX_FACE IS LARGER THAN THE HIGHEST MODIFIABLE INDEX, IT GETS STUCK
     print(f'Generating a new face using {FACE_NAME} for idx_face: {idx_face}')
     response = CI_call(idx_face=idx_face, PARAM_DICTIONARY=PARAM_DICTIONARY, TOKEN_DICTIONARY=TOKEN_DICTIONARY)
-    print(response)
+    print('response CI_call:',response)
+    if response.get('code') is not None:
+        return False, ''
 
     # Asynchronous API call to get the output
     TARGET_NAME = PARAM_DICTIONARY.get('TARGET_NAME')
@@ -41,7 +43,7 @@ def process_image(PARAM_DICTIONARY, TOKEN_DICTIONARY):
     if flag_response is False:
         # Error
         print('Error retrieving the generated faces. No images found after 10 attempts')
-        return False
+        return False, ''
 
     download_link = response_notifications.get('link_hd')  # high quality version - pro user
     if download_link is None:
@@ -53,4 +55,4 @@ def process_image(PARAM_DICTIONARY, TOKEN_DICTIONARY):
     
     # print(response_notifications)
     print('new image ready for download:', download_link)
-    return True
+    return True, download_link
