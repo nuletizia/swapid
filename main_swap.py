@@ -31,7 +31,8 @@ if __name__ == '__main__':
     parser.add_argument('--strength', help='Input face have low impact on the output for low values of the strength (range 0-1)', type=float, default=None)
 
     # Consistent identities parameters
-    parser.add_argument('--hair', help='Change also the hair', action='store_true')
+    parser.add_argument('--hair', help='Modify the hair of the target image', action='store_true')
+    parser.add_argument('--transfer_hair', help='Transfer source hair to target when possible', action='store_true')
     parser.add_argument('--idx_face', help='Index of the person to change in the target image', type=check_range, default=0)
 
     args = parser.parse_args()
@@ -42,6 +43,8 @@ if __name__ == '__main__':
 
     # Consistent identities parameters
     HEADSWAP = args.hair  # True if the swap shall include the hair (Head-swap)
+    TRANSFER_HAIR = args.transfer_hair  # True if to transfer source hair into target
+
     IDX_FACE = args.idx_face  # index of the person in the target image to swap
 
     # Parameters
@@ -94,6 +97,7 @@ if __name__ == '__main__':
     # to add many more
     PARAM_DICTIONARY = {
             'HEADSWAP': HEADSWAP,
+            'TRANSFER_HAIR': TRANSFER_HAIR,
             'IDX_FACE': IDX_FACE,
             'TARGET_PATH': TARGET_PATH,
             'TARGET_URL': TARGET_URL,

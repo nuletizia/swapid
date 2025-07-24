@@ -29,7 +29,6 @@ def process_image(PARAM_DICTIONARY, TOKEN_DICTIONARY):
 
     idx_face = PARAM_DICTIONARY.get('IDX_FACE', 0)  # select which person in the target image you want to swap with the input face
 
-    # WE NEED TO ADD A VERIFICATION MECHANISM OF THE IDX_FACE, BECAUSE IF THE IDX_FACE IS LARGER THAN THE HIGHEST MODIFIABLE INDEX, IT GETS STUCK
     print(f'Generating a new face using {FACE_NAME} for idx_face: {idx_face}')
     response = CI_call(idx_face=idx_face, PARAM_DICTIONARY=PARAM_DICTIONARY, TOKEN_DICTIONARY=TOKEN_DICTIONARY)
     print(response)
