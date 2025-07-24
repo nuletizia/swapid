@@ -1,17 +1,17 @@
 <p align="center">
   <img src="https://id.piktid.com/logo.svg" alt="SwapID by PiktID logo" width="150">
   </br>
-  <h3 align="center"><a href="[https://studio.piktid.com](https://swap.piktid.com)">SwapID by PiktID</a></h3>
+  <h3 align="center"><a href="[https://studio.piktid.com](https://studio.piktid.com/swap)">SwapID by PiktID</a></h3>
 </p>
 
 
-# SwapID - v3.2.1
+# SwapID - v3.3.1
 [![Official Website](https://img.shields.io/badge/Official%20Website-piktid.com-blue?style=flat&logo=world&logoColor=white)](https://piktid.com)
 [![Discord Follow](https://dcbadge.vercel.app/api/server/FJU39e9Z4P?style=flat)](https://discord.com/invite/FJU39e9Z4P)
 
-Face Swap implementation by PiktID, also available online at <a href="https://swap.piktid.com">swap.piktid.com</a>
+Face Swap implementation by PiktID, also available online at <a href="https://studio.piktid.com/swap">studio.piktid.com</a>
 
-This implementation relies on the <a href="https://github.com/piktid/eraseid">EraseID infrastructure and APIs</a>. Check more on <a href="https://id.piktid.com">EraseID web-application</a>.
+This implementation relies on the <a href="https://github.com/piktid/eraseid">EraseID infrastructure and APIs</a>. 
 
 ## Getting Started
 <a target="_blank" href="https://colab.research.google.com/drive/1thetaQymYgpHtFu1nAUwbsq3Su3vxXAC?usp=sharing">
@@ -19,7 +19,7 @@ This implementation relies on the <a href="https://github.com/piktid/eraseid">Er
 </a>
 
 The following instructions suppose you have already installed a recent version of Python. For a general overview, please visit the <a href="https://api.piktid.com/docs">API documentation</a>.
-To use any PiktID API, an access token is required. Moreover, PiktID is currently manually granting access to users.
+To use any PiktID API, an access token is required.
 
 > **Step 0** - Register <a href="https://studio.piktid.com">here</a>. 10 credits are given for free to all new users.
 
@@ -54,7 +54,7 @@ or
 ...
 ```
 
-> **Step 4** - Run the main function with the selected endpoint
+> **Step 4** - Run the main function with the selected images
 ```bash
 $ python3 main_swap.py --target_path 'mydir/mytarget.jpg' --face_path 'mydir/mysource.jpg'
 ```
@@ -80,10 +80,15 @@ If you have a **target image** with multiple subjects, you need to inform the sy
 $ python3 main_swap.py --target_path 'mydir/mytarget.jpg' --face_path 'mydir/mysource.jpg' --idx_face 0
 ```
 
-## Head Swap
+## Head Swap and Hair Transfer
 It is also possible to include the hair in the swapping process. To do that, you need to run the command 
 ```bash
 $ python3 main_swap.py --target_path 'mydir/mytarget.jpg' --face_path 'mydir/mysource.jpg' --hair
+```
+
+If you want to completely transfer the hairstyle of the source to the target, you can use the following command (which works for a strength greater than 0.5)
+```bash
+$ python3 main_swap.py --target_path 'mydir/mytarget.jpg' --face_path 'mydir/mysource.jpg' --hair --transfer_hair
 ```
 
 ## Skin Swap (Coming soon)
