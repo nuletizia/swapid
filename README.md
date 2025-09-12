@@ -91,7 +91,11 @@ If you want to completely transfer the hairstyle of the source to the target, yo
 $ python3 main_swap.py --target_path 'mydir/mytarget.jpg' --face_path 'mydir/mysource.jpg' --hair --transfer_hair
 ```
 
-## Skin Swap (Coming soon)
+## Skin Swap
+If you want to adjust the body skin of the swapped image, you can use the following command
+```bash
+$ python3 main_swap.py --target_path 'mydir/mytarget.jpg' --face_path 'mydir/mysource.jpg' --skin
+```
 Please contact us for more details.
 
 ## Contact
