@@ -225,13 +225,47 @@ def consistent_generation_call(idx_face, PARAM_DICTIONARY, TOKEN_DICTIONARY):
     return response_json
 
 
+def change_skin_call(image_address, idx_face, idx_generation, PARAM_DICTIONARY, TOKEN_DICTIONARY):
+
+    data = {
+            'id_image': image_address, 
+            'id_face': idx_face, 
+            'id_generation': idx_generation, 
+            'description_type': 'json', 
+            'prompt': '{}'
+        }
+        
+    print(f'data to send to skin editing: {data}')
+
+    # start the generation process given the image parameters
+    TOKEN = TOKEN_DICTIONARY.get('access_token', '')
+    URL_API = TOKEN_DICTIONARY.get('url_api')
+
+    response = requests.post(URL_API+'/ask_generate_skin_full_body',
+                             headers={'Authorization': 'Bearer '+TOKEN},
+                             json=data,
+                             )
+    # print(response.text)
+    # if the access token is expired
+    if response.status_code == 401:
+        TOKEN_DICTIONARY = refresh_call(TOKEN_DICTIONARY)
+        TOKEN = TOKEN_DICTIONARY.get('access_token', '')
+        # try with new TOKEN
+        response = requests.post(URL_API+'/ask_generate_skin_full_body',
+                                 headers={'Authorization': 'Bearer '+TOKEN},
+                                 json=data,
+                                 )
+    response_json = json.loads(response.text)
+    return response_json
+
+
 # -----------NOTIFICATIONS FUNCTIONS------------
 def get_notification_by_name(name_list, TOKEN_DICTIONARY):
     # name_list='new_generation, progress, error'
     TOKEN = TOKEN_DICTIONARY.get('access_token', '')
     URL_API = TOKEN_DICTIONARY.get('url_api')
 
-    response = requests.post(URL_API+'/consistent_identities/notification/read',
+    response = requests.post(URL_API+'/notification_by_name_json',
                              headers={'Authorization': 'Bearer '+TOKEN},
                              json={'name_list': name_list},
                              # timeout=100,
@@ -241,7 +275,7 @@ def get_notification_by_name(name_list, TOKEN_DICTIONARY):
         # try with new TOKEN
         TOKEN_DICTIONARY = refresh_call(TOKEN_DICTIONARY)
         TOKEN = TOKEN_DICTIONARY.get('access_token', '')
-        response = requests.post(URL_API+'/consistent_identities/notification/read',
+        response = requests.post(URL_API+'/notification_by_name_json',
                                  headers={'Authorization': 'Bearer '+TOKEN},
                                  json={'name_list': name_list},
                                  # timeout=100,
@@ -256,7 +290,7 @@ def delete_notification(notification_id, TOKEN_DICTIONARY):
     URL_API = TOKEN_DICTIONARY.get('url_api')
 
     print(f'notification_id: {notification_id}')
-    response = requests.delete(URL_API+'/consistent_identities/notification/delete',
+    response = requests.delete(URL_API+'/notification/delete_json',
                                headers={'Authorization': 'Bearer '+TOKEN},
                                json={'id': notification_id},
                                # timeout=100,
@@ -266,12 +300,11 @@ def delete_notification(notification_id, TOKEN_DICTIONARY):
         # try with new TOKEN
         TOKEN_DICTIONARY = refresh_call(TOKEN_DICTIONARY)
         TOKEN = TOKEN_DICTIONARY.get('access_token', '')
-        response = requests.delete(URL_API+'/consistent_identities/notification/delete',
+        response = requests.delete(URL_API+'/notification/delete_json',
                                    headers={'Authorization': 'Bearer '+TOKEN},
                                    json={'id': notification_id},
                                    # timeout=100,
                                    )
-
     # print(response.text)
     return response.text
 
@@ -302,4 +335,30 @@ def handle_notifications_new_swap_download(image_id, TOKEN_DICTIONARY):
         print('waiting for notification...')
         sleep(30)
 
+    return False, {}
+
+
+def handle_notifications_new_skin(image_id, idx_face, TOKEN_DICTIONARY):
+
+    # check notifications to verify the generation status
+    i = 0
+    while i < 60:  # max 60 iterations -> then timeout
+        i = i+1
+        notifications_list = get_notification_by_name('new_skin,error', TOKEN_DICTIONARY)
+        notifications_to_remove = [n for n in notifications_list if (n.get('name')=='new_skin' and n.get('data').get('address')==image_id and n.get('data').get('f')==idx_face and n.get('data').get('msg')=='done')]
+
+        print(f'notifications_to_remove: {notifications_to_remove}')
+        # remove notifications
+        result_delete = [delete_notification(n.get('id'), TOKEN_DICTIONARY) for n in notifications_to_remove ]
+        # print(result_delete)
+
+        if len(notifications_to_remove) > 0:
+            print(f'replace for face {idx_face} with full skin completed')
+            return True, {**notifications_to_remove[0].get('data',{})}
+
+        # wait
+        print('waiting for notification...')
+        sleep(10)
+
+    print('Timeout. Error in editing skin')
     return False, {}

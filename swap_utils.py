@@ -1,4 +1,4 @@
-from consistent_identities_api import upload_target_call as CI_upload_target_call, upload_face_call as CI_upload_face_call, consistent_generation_call as CI_call, handle_notifications_new_swap_download as CI_handle_notifications_new
+from consistent_identities_api import upload_target_call as CI_upload_target_call, upload_face_call as CI_upload_face_call, consistent_generation_call as CI_call, handle_notifications_new_swap_download as CI_handle_notifications_new, handle_notifications_new_skin as CI_handle_notifications_new_skin, change_skin_call as CI_change_skin_call
 
 
 def process_image(PARAM_DICTIONARY, TOKEN_DICTIONARY):
@@ -49,6 +49,20 @@ def process_image(PARAM_DICTIONARY, TOKEN_DICTIONARY):
         download_link = response_notifications.get('link')  # low quality version
     if download_link == '':
         download_link = response_notifications.get('link')  # low quality version
+
+    CHANGE_SKIN = PARAM_DICTIONARY.get('CHANGE_SKIN')
+    if CHANGE_SKIN:
+        # pick does not to be called when changing skin
+        idx_generation = 0 # select the first generation
+        print('Editing the skin')
+        response = CI_change_skin_call(image_address=image_id, idx_face=idx_face, idx_generation=idx_generation, PARAM_DICTIONARY=PARAM_DICTIONARY, TOKEN_DICTIONARY=TOKEN_DICTIONARY)
+        print(f'Skin editing response:{response}')
+        # Asynchronous API call
+        response_notifications, skin_data = CI_handle_notifications_new_skin(image_id, idx_face, TOKEN_DICTIONARY)
+        if response_notifications is False:
+            # Error
+            return False
+        download_link = [skin_data.get("link").get("l")]
     
     # print(response_notifications)
     print('new image ready for download:', download_link)
