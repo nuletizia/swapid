@@ -279,7 +279,7 @@ def handle_notifications_new_swap_download(image_id):
         notifications_list = get_notification_by_name('download')
         notifications_to_remove = [n for n in notifications_list if (n.get('name') == 'download' and n.get('data').get('id_image') == image_id )]
 
-        print(f'notifications_to_remove: {notifications_to_remove}')
+        #print(f'notifications_to_remove: {notifications_to_remove}')
         # remove notifications
         result_delete = [delete_notification(n.get('id')) for n in notifications_to_remove]
         print(result_delete)
@@ -309,7 +309,7 @@ def handle_notifications_new_skin(image_id, idx_face):
         notifications_list = get_notification_by_name('new_skin,error')
         notifications_to_remove = [n for n in notifications_list if (n.get('name')=='new_skin' and n.get('data').get('address')==image_id and n.get('data').get('f')==idx_face and n.get('data').get('msg')=='done')]
 
-        print(f'notifications_to_remove: {notifications_to_remove}')
+        #print(f'notifications_to_remove: {notifications_to_remove}')
         # remove notifications
         result_delete = [delete_notification(n.get('id')) for n in notifications_to_remove ]
         # print(result_delete)
