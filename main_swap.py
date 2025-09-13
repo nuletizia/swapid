@@ -4,7 +4,7 @@ import argparse
 from random import randint
 
 from swap_utils import process_image
-from consistent_identities_api import start_call
+from auth import piktid_auth
 
 
 def check_range(value):
@@ -37,10 +37,6 @@ if __name__ == '__main__':
     parser.add_argument('--idx_face', help='Index of the person to change in the target image', type=check_range, default=0)
 
     args = parser.parse_args()
-
-    # be sure to export your email and psw as environmental variables
-    EMAIL = os.getenv("SWAPID_EMAIL")
-    PASSWORD = os.getenv("SWAPID_PASSWORD")
 
     # Consistent identities parameters
     HEADSWAP = args.hair  # True if the swap shall include the hair (Head-swap)
@@ -93,9 +89,6 @@ if __name__ == '__main__':
             print('Wrong face url, check again')
             sys.exit()
 
-    # log in
-    TOKEN_DICTIONARY = start_call(EMAIL, PASSWORD)
-
     # to add many more
     PARAM_DICTIONARY = {
             'HEADSWAP': HEADSWAP,
@@ -112,4 +105,9 @@ if __name__ == '__main__':
             'CHANGE_SKIN': CHANGE_SKIN,
         }
 
-    response = process_image(PARAM_DICTIONARY, TOKEN_DICTIONARY)
+    # Authenticate and get the access token
+    if not piktid_auth():
+        print('Authentication failed, please check your credentials')
+        sys.exit()
+    
+    response = process_image(PARAM_DICTIONARY)
