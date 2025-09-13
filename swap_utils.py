@@ -40,7 +40,7 @@ def process_image(PARAM_DICTIONARY):
     if flag_response is False:
         # Error
         print('Error retrieving the generated faces. No images found after 10 attempts')
-        return False
+        return False, ''
 
     download_link = response_notifications.get('link_hd')  # high quality version - pro user
     if download_link is None:
@@ -66,4 +66,4 @@ def process_image(PARAM_DICTIONARY):
     
     # print(response_notifications)
     print('new image ready for download:', download_link)
-    return True
+    return True, download_link

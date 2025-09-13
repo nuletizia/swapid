@@ -156,6 +156,9 @@ def upload_face_call(PARAM_DICTIONARY):
 def consistent_generation_call(idx_face, PARAM_DICTIONARY):
 
     image_address = PARAM_DICTIONARY.get('TARGET_NAME')
+    if image_address is None:
+        return {'code':400, 'description':'id_image may not be null.'}
+    
     identity_name = PARAM_DICTIONARY.get('FACE_NAME')
 
     SEED = PARAM_DICTIONARY.get('SEED')
