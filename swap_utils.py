@@ -55,7 +55,7 @@ def process_image(PARAM_DICTIONARY):
         # pick does not to be called when changing skin
         idx_generation = 0 # select the first generation
         print('Editing the skin')
-        response = CI_change_skin_call(image_address=image_id, idx_face=idx_face, idx_generation=idx_generation, PARAM_DICTIONARY=PARAM_DICTIONARY)
+        response = CI_change_skin_call(image_address=image_id, idx_face=idx_face, idx_generation=idx_generation)
         print(f'Skin editing response:{response}')
         # Asynchronous API call
         response_notifications, skin_data = CI_handle_notifications_new_skin(image_id, idx_face)
