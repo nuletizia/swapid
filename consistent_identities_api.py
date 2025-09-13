@@ -282,7 +282,7 @@ def handle_notifications_new_swap_download(image_id):
         #print(f'notifications_to_remove: {notifications_to_remove}')
         # remove notifications
         result_delete = [delete_notification(n.get('id')) for n in notifications_to_remove]
-        print(result_delete)
+        #print(result_delete)
 
         if len(notifications_to_remove) > 0:
             print(f'download for image_id {image_id} completed')

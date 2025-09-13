@@ -31,7 +31,7 @@ def process_image(PARAM_DICTIONARY):
 
     print(f'Generating a new face using {FACE_NAME} for idx_face: {idx_face}')
     response = CI_call(idx_face=idx_face, PARAM_DICTIONARY=PARAM_DICTIONARY)
-    print(response)
+    #print(response)
 
     # Asynchronous API call to get the output
     TARGET_NAME = PARAM_DICTIONARY.get('TARGET_NAME')
