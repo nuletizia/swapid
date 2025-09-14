@@ -32,8 +32,14 @@ $ cd swapid
 
 > **Step 2** - Export the email and password as environmental variables
 ```bash
-$ export SWAPID_EMAIL={Your email here}
-$ export SWAPID_PASSWORD={Your password here}
+$ export PIKTID_EMAIL={Your email here}
+$ export PIKTID_PASSWORD={Your password here}
+```
+
+or the authenticaton tokens - get them in https://studio.piktid.com/profile -> Tokens & Sessions
+```bash
+$ export ACCESS_TOKEN={Your access token}
+$ export REFRESH_TOKEN={Your refresh token}
 ```
 
 > **Step 3** - You can provide both the absolute path of the target and face image (containing a person). Add the arguments

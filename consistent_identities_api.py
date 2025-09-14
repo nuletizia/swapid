@@ -4,6 +4,10 @@ from io import BytesIO
 import base64
 from PIL import Image, ImageCms
 from time import sleep
+import os
+from config import Config
+from auth import refresh_call
+
 
 
 # -----------READ/WRITE FUNCTIONS------------
@@ -53,37 +57,11 @@ def im_2_b64(image):
     return img_str
 
 
-# -----------PROCESSING FUNCTIONS------------
-def start_call(email, password, server_mode='production'):
-    # Get token
-    if server_mode == 'production':
-        URL_API = 'https://api.piktid.com/api'
-    else:
-        print('Error server mode, exiting..')
-        return {}
-    print(f'Logging to: {URL_API}')
 
-    response = requests.post(URL_API+'/tokens', data={}, auth=(email, password))
-    response_json = json.loads(response.text)
-    ACCESS_TOKEN = response_json['access_token']
-    REFRESH_TOKEN = response_json['refresh_token']
-
-    return {'access_token': ACCESS_TOKEN, 'refresh_token': REFRESH_TOKEN, 'url_api': URL_API, 'server_mode': server_mode}
-
-
-def refresh_call(TOKEN_DICTIONARY):
-    # Get token using only access and refresh tokens, no mail and psw
-    URL_API = TOKEN_DICTIONARY.get('url_api')
-    response = requests.put(URL_API+'/tokens', json=TOKEN_DICTIONARY)
-    response_json = json.loads(response.text)
-    ACCESS_TOKEN = response_json['access_token']
-    REFRESH_TOKEN = response_json['refresh_token']
-
-    return {'access_token': ACCESS_TOKEN, 'refresh_token': REFRESH_TOKEN, 'url_api': URL_API}
 
 
 # -----------UPLOAD FUNCTIONS------------
-def upload_target_call(PARAM_DICTIONARY, TOKEN_DICTIONARY):
+def upload_target_call(PARAM_DICTIONARY):
 
     HEADSWAP = PARAM_DICTIONARY.get('HEADSWAP')
 
@@ -103,21 +81,20 @@ def upload_target_call(PARAM_DICTIONARY, TOKEN_DICTIONARY):
         OPTIONS_DICT = {**OPTIONS_DICT, 'flag_hair': HEADSWAP}
 
     # start the generation process given the image parameters
-    TOKEN = TOKEN_DICTIONARY.get('access_token', '')
-    URL_API = TOKEN_DICTIONARY.get('url_api')
 
-    response = requests.post(URL_API+'/consistent_identities/upload_target', 
-                             headers={'Authorization': 'Bearer '+TOKEN},
+    response = requests.post(Config.URL_API+'/consistent_identities/upload_target', 
+                             headers={'Authorization': f"Bearer {os.environ['ACCESS_TOKEN']}"},
                              files={'file': image_file},
                              data={'options': json.dumps(OPTIONS_DICT)},
                              )
 
     if response.status_code == 401:
-        TOKEN_DICTIONARY = refresh_call(TOKEN_DICTIONARY)
-        TOKEN = TOKEN_DICTIONARY.get('access_token', '')
+        # try to refresh the token
+        refresh_call()
+        
         # try with new TOKEN
-        response = requests.post(URL_API+'/consistent_identities/upload_target', 
-                                 headers={'Authorization': 'Bearer '+TOKEN},
+        response = requests.post(Config.URL_API+'/consistent_identities/upload_target', 
+                                 headers={'Authorization': f"Bearer {os.environ['ACCESS_TOKEN']}"}, 
                                  files={'file': image_file},
                                  data={'options': json.dumps(OPTIONS_DICT)},
                                  )
@@ -139,7 +116,7 @@ def upload_target_call(PARAM_DICTIONARY, TOKEN_DICTIONARY):
     return image_address
 
 
-def upload_face_call(PARAM_DICTIONARY, TOKEN_DICTIONARY):
+def upload_face_call(PARAM_DICTIONARY):
 
     face_full_path = PARAM_DICTIONARY.get('FACE_PATH')
     if face_full_path is None:
@@ -154,21 +131,18 @@ def upload_face_call(PARAM_DICTIONARY, TOKEN_DICTIONARY):
     identity_name = PARAM_DICTIONARY.get('FACE_NAME')
 
     # start the generation process given the image parameters
-    TOKEN = TOKEN_DICTIONARY.get('access_token', '')
-    URL_API = TOKEN_DICTIONARY.get('url_api')
 
-    response = requests.post(URL_API+'/consistent_identities/upload_face', 
-                             headers={'Authorization': 'Bearer '+TOKEN},
+    response = requests.post(Config.URL_API+'/consistent_identities/upload_face', 
+                             headers={'Authorization': f"Bearer {os.environ['ACCESS_TOKEN']}"},
                              files={'file': face_file},
                              data={'identity_name': identity_name},
                              )
 
     if response.status_code == 401:
-        TOKEN_DICTIONARY = refresh_call(TOKEN_DICTIONARY)
-        TOKEN = TOKEN_DICTIONARY.get('access_token', '')
+        refresh_call()
         # try with new TOKEN
-        response = requests.post(URL_API+'/consistent_identities/upload_face', 
-                                 headers={'Authorization': 'Bearer '+TOKEN},
+        response = requests.post(Config.URL_API+'/consistent_identities/upload_face', 
+                                 headers={'Authorization': f"Bearer {os.environ['ACCESS_TOKEN']}"}, 
                                  files={'file': face_file},
                                  data={'identity_name': identity_name},
                                  )
@@ -179,9 +153,12 @@ def upload_face_call(PARAM_DICTIONARY, TOKEN_DICTIONARY):
 
 
 # -----------SWAP FUNCTION------------
-def consistent_generation_call(idx_face, PARAM_DICTIONARY, TOKEN_DICTIONARY):
+def consistent_generation_call(idx_face, PARAM_DICTIONARY):
 
     image_address = PARAM_DICTIONARY.get('TARGET_NAME')
+    if image_address is None:
+        return {'code':400, 'description':'id_image may not be null.'}
+    
     identity_name = PARAM_DICTIONARY.get('FACE_NAME')
 
     SEED = PARAM_DICTIONARY.get('SEED')
@@ -203,20 +180,17 @@ def consistent_generation_call(idx_face, PARAM_DICTIONARY, TOKEN_DICTIONARY):
     print(f'data to send to generation: {data}')
 
     # start the generation process given the image parameters
-    TOKEN = TOKEN_DICTIONARY.get('access_token', '')
-    URL_API = TOKEN_DICTIONARY.get('url_api')
 
-    response = requests.post(URL_API+'/consistent_identities/generate',
-                             headers={'Authorization': 'Bearer '+TOKEN},
+    response = requests.post(Config.URL_API+'/consistent_identities/generate',
+                             headers={'Authorization': f"Bearer {os.environ['ACCESS_TOKEN']}"},
                              json=data,
                              )
     # if the access token is expired
     if response.status_code == 401:
-        TOKEN_DICTIONARY = refresh_call(TOKEN_DICTIONARY)
-        TOKEN = TOKEN_DICTIONARY.get('access_token', '')
+        refresh_call()
         # try with new TOKEN
-        response = requests.post(URL_API+'/consistent_identities/generate',
-                                 headers={'Authorization': 'Bearer '+TOKEN},
+        response = requests.post(Config.URL_API+'/consistent_identities/generate',
+                                 headers={'Authorization': f"Bearer {os.environ['ACCESS_TOKEN']}"}, 
                                  json=data,
                                  )
 
@@ -225,7 +199,7 @@ def consistent_generation_call(idx_face, PARAM_DICTIONARY, TOKEN_DICTIONARY):
     return response_json
 
 
-def change_skin_call(image_address, idx_face, idx_generation, PARAM_DICTIONARY, TOKEN_DICTIONARY):
+def change_skin_call(image_address, idx_face, idx_generation):
 
     data = {
             'id_image': image_address, 
@@ -238,21 +212,18 @@ def change_skin_call(image_address, idx_face, idx_generation, PARAM_DICTIONARY, 
     print(f'data to send to skin editing: {data}')
 
     # start the generation process given the image parameters
-    TOKEN = TOKEN_DICTIONARY.get('access_token', '')
-    URL_API = TOKEN_DICTIONARY.get('url_api')
 
-    response = requests.post(URL_API+'/ask_generate_skin_full_body',
-                             headers={'Authorization': 'Bearer '+TOKEN},
+    response = requests.post(Config.URL_API+'/ask_generate_skin_full_body',
+                             headers={'Authorization': f"Bearer {os.environ['ACCESS_TOKEN']}"}, 
                              json=data,
                              )
     # print(response.text)
     # if the access token is expired
     if response.status_code == 401:
-        TOKEN_DICTIONARY = refresh_call(TOKEN_DICTIONARY)
-        TOKEN = TOKEN_DICTIONARY.get('access_token', '')
+        refresh_call()
         # try with new TOKEN
-        response = requests.post(URL_API+'/ask_generate_skin_full_body',
-                                 headers={'Authorization': 'Bearer '+TOKEN},
+        response = requests.post(Config.URL_API+'/ask_generate_skin_full_body',
+                                 headers={'Authorization': f"Bearer {os.environ['ACCESS_TOKEN']}"}, 
                                  json=data,
                                  )
     response_json = json.loads(response.text)
@@ -260,23 +231,19 @@ def change_skin_call(image_address, idx_face, idx_generation, PARAM_DICTIONARY, 
 
 
 # -----------NOTIFICATIONS FUNCTIONS------------
-def get_notification_by_name(name_list, TOKEN_DICTIONARY):
+def get_notification_by_name(name_list):
     # name_list='new_generation, progress, error'
-    TOKEN = TOKEN_DICTIONARY.get('access_token', '')
-    URL_API = TOKEN_DICTIONARY.get('url_api')
 
-    response = requests.post(URL_API+'/notification_by_name_json',
-                             headers={'Authorization': 'Bearer '+TOKEN},
+    response = requests.post(Config.URL_API+'/notification_by_name_json',
+                             headers={'Authorization': f"Bearer {os.environ['ACCESS_TOKEN']}"}, 
                              json={'name_list': name_list},
                              # timeout=100,
                              )
     # if the access token is expired
     if response.status_code == 401:
-        # try with new TOKEN
-        TOKEN_DICTIONARY = refresh_call(TOKEN_DICTIONARY)
-        TOKEN = TOKEN_DICTIONARY.get('access_token', '')
-        response = requests.post(URL_API+'/notification_by_name_json',
-                                 headers={'Authorization': 'Bearer '+TOKEN},
+        refresh_call()
+        response = requests.post(Config.URL_API+'/notification_by_name_json',
+                                 headers={'Authorization': f"Bearer {os.environ['ACCESS_TOKEN']}"}, 
                                  json={'name_list': name_list},
                                  # timeout=100,
                                  )
@@ -285,23 +252,18 @@ def get_notification_by_name(name_list, TOKEN_DICTIONARY):
     return response_json.get('notifications_list',[])
 
 
-def delete_notification(notification_id, TOKEN_DICTIONARY):
-    TOKEN = TOKEN_DICTIONARY.get('access_token', '')
-    URL_API = TOKEN_DICTIONARY.get('url_api')
-
+def delete_notification(notification_id):
     print(f'notification_id: {notification_id}')
-    response = requests.delete(URL_API+'/notification/delete_json',
-                               headers={'Authorization': 'Bearer '+TOKEN},
+    response = requests.delete(Config.URL_API+'/notification/delete_json',
+                               headers={'Authorization': f"Bearer {os.environ['ACCESS_TOKEN']}"}, 
                                json={'id': notification_id},
                                # timeout=100,
                                )
     # if the access token is expired
     if response.status_code == 401:
-        # try with new TOKEN
-        TOKEN_DICTIONARY = refresh_call(TOKEN_DICTIONARY)
-        TOKEN = TOKEN_DICTIONARY.get('access_token', '')
-        response = requests.delete(URL_API+'/notification/delete_json',
-                                   headers={'Authorization': 'Bearer '+TOKEN},
+        refresh_call()
+        response = requests.delete(Config.URL_API+'/notification/delete_json',
+                                   headers={'Authorization': f"Bearer {os.environ['ACCESS_TOKEN']}"}, 
                                    json={'id': notification_id},
                                    # timeout=100,
                                    )
@@ -309,18 +271,18 @@ def delete_notification(notification_id, TOKEN_DICTIONARY):
     return response.text
 
 
-def handle_notifications_new_swap_download(image_id, TOKEN_DICTIONARY):
+def handle_notifications_new_swap_download(image_id):
     # check notifications to verify the generation status
     i = 0
     while i < 10:  # max 20 iterations -> then timeout
         i = i+1
-        notifications_list = get_notification_by_name('download', TOKEN_DICTIONARY)
+        notifications_list = get_notification_by_name('download')
         notifications_to_remove = [n for n in notifications_list if (n.get('name') == 'download' and n.get('data').get('id_image') == image_id )]
 
-        print(f'notifications_to_remove: {notifications_to_remove}')
+        #print(f'notifications_to_remove: {notifications_to_remove}')
         # remove notifications
-        result_delete = [delete_notification(n.get('id'), TOKEN_DICTIONARY) for n in notifications_to_remove]
-        print(result_delete)
+        result_delete = [delete_notification(n.get('id')) for n in notifications_to_remove]
+        #print(result_delete)
 
         if len(notifications_to_remove) > 0:
             print(f'download for image_id {image_id} completed')
@@ -338,18 +300,18 @@ def handle_notifications_new_swap_download(image_id, TOKEN_DICTIONARY):
     return False, {}
 
 
-def handle_notifications_new_skin(image_id, idx_face, TOKEN_DICTIONARY):
+def handle_notifications_new_skin(image_id, idx_face):
 
     # check notifications to verify the generation status
     i = 0
     while i < 60:  # max 60 iterations -> then timeout
         i = i+1
-        notifications_list = get_notification_by_name('new_skin,error', TOKEN_DICTIONARY)
+        notifications_list = get_notification_by_name('new_skin,error')
         notifications_to_remove = [n for n in notifications_list if (n.get('name')=='new_skin' and n.get('data').get('address')==image_id and n.get('data').get('f')==idx_face and n.get('data').get('msg')=='done')]
 
-        print(f'notifications_to_remove: {notifications_to_remove}')
+        #print(f'notifications_to_remove: {notifications_to_remove}')
         # remove notifications
-        result_delete = [delete_notification(n.get('id'), TOKEN_DICTIONARY) for n in notifications_to_remove ]
+        result_delete = [delete_notification(n.get('id')) for n in notifications_to_remove ]
         # print(result_delete)
 
         if len(notifications_to_remove) > 0:
